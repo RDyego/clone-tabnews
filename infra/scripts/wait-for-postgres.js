@@ -23,7 +23,7 @@ function checkPostgres() {
       return;
     }
     process.stdout.write(`\r⚫ ${messageWaiting} - ${showElapsedTime()}`);
-    process.stdout.write(`\n🟢 ${messageReady}\n`);
+    process.stdout.write(`\n🟢 ${messageReady}\n\n`);
   }
 }
 
