@@ -1,7 +1,7 @@
 import "app/globals.css";
 import productsData from "app/public/products.json";
 import Image from "next/image";
-import { generatePayloadPix } from "./payload";
+import { generatePayloadPix } from "infra/payload.js";
 import { useEffect, useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
 
