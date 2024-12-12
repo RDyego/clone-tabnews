@@ -57,7 +57,7 @@ function QRModal({ product, onClose }) {
     setPixQrCodeValue(
       generatePayloadPix({
         key: "afa0e314-252b-4579-aac3-c8e8e5588415",
-        name: "Raphaell Dyego Cruz Vaz",
+        name: "Raphaell",
         city: "FORTALEZA",
         transactionId: `NICOLAS${new Date().getTime()}`,
         message: "",
