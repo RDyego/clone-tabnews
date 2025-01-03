@@ -115,7 +115,7 @@ function NicolasPage() {
     <div className="min-h-screen bg-gradient-to-b from-blue-50 via-white to-blue-50">
       <div className="container mx-auto py-12 flex flex-col items-center">
         <h1 className="text-5xl font-bold mb-12 text-blue-700 animate-bounce max-md:text-2xl">
-          👶 Bem-vindo Nicolas! 🎉
+          👶 Chá de fraldas do Nicolas! 🎉
         </h1>
         <ProductList products={productsData.results} />
       </div>
