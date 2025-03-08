@@ -10,7 +10,11 @@ function ProductList({ products }) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl w-full px-4">
       {products
-        .filter((x) => x.price && x.name.toLowerCase().includes("fralda"))
+        .filter((x) => x.price)
+        .filter((x) => x.name.toLowerCase().includes("fralda"))
+        .filter((x) => !x.name.toLowerCase().includes("bigfral"))
+        .filter((x) => x.price / 100 > 45 && x.price / 100 < 100)
+        .map((p) => ({ ...p, price: p.price / 100 }))
         .map((product, index) => (
           <div
             key={index}
