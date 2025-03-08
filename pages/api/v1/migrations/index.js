@@ -1,43 +1,22 @@
-import migrationRunner from "node-pg-migrate";
-import { resolve } from "node:path";
-import database from "infra/database.js";
+import { createRouter } from "next-connect";
+import controller from "infra/controller";
+import migrator from "models/migrator";
 
-export default async function migrations(req, res) {
-  const allowedMethods = ["GET", "POST"];
-  if (!allowedMethods.includes(req.method))
-    return res
-      .status(405)
-      .json({ error: `Method "${req.method}" not allowed` });
+const router = createRouter();
 
-  let dbClient;
-  try {
-    dbClient = await database.getNewClient();
+router.get(getHandler);
+router.post(postHandler);
 
-    const defaultMigrationsOptions = {
-      dbClient,
-      databaseUrl: process.env.DATABASE_URL,
-      dryRun: true,
-      dir: resolve("infra", "migrations"),
-      direction: "up",
-      verbose: true,
-      migrationsTable: "pgmigrations",
-    };
-    if (req.method === "GET") {
-      const pendingMigrations = await migrationRunner(defaultMigrationsOptions);
-      return res.status(200).json(pendingMigrations);
-    }
-    if (req.method === "POST") {
-      const migratedMigrations = await migrationRunner({
-        ...defaultMigrationsOptions,
-        dryRun: false,
-      });
-      if (migratedMigrations.length > 0)
-        return res.status(201).json(migratedMigrations);
-      return res.status(200).json(migratedMigrations);
-    }
-  } catch (error) {
-    res.status(405).json({ error });
-  } finally {
-    if (dbClient) await dbClient.end();
-  }
+export default router.handler(controller.errorHandlers);
+
+async function getHandler(req, res) {
+  const pendingMigrations = await migrator.listPendingMigrations();
+  return res.status(200).json(pendingMigrations);
+}
+
+async function postHandler(req, res) {
+  const migratedMigrations = await migrator.runPendingMigrations();
+  if (migratedMigrations.length > 0)
+    return res.status(201).json(migratedMigrations);
+  return res.status(200).json(migratedMigrations);
 }
