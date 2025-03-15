@@ -18,9 +18,9 @@ function ProductList({ products }) {
         .map((product, index) => (
           <div
             key={index}
-            className="flex flex-col justify-between border-2 p-6 rounded-xl border-blue-200 bg-white hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
+            className="flex flex-col justify-between border-2 p-6 rounded-xl border-[#a5b69d] bg-white hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
           >
-            <div className="bg-blue-50 rounded-lg p-4 mb-4">
+            <div className="bg-[#f0f4ed] rounded-lg p-4 mb-4">
               <Image
                 src={product.thumbnail}
                 alt={product.name}
@@ -29,15 +29,15 @@ function ProductList({ products }) {
                 className="w-full h-48 object-contain"
               />
             </div>
-            <h2 className="text-xl font-bold text-blue-800 mb-2">
+            <h2 className="text-xl font-bold text-[#5a7154] mb-2">
               {product.name}
             </h2>
-            <p className="text-blue-600 text-lg font-semibold mb-4">
+            <p className="text-[#75906d] text-lg font-semibold mb-4">
               R$ {product.price?.toFixed(2)}
             </p>
             <button
               onClick={() => setSelectedProduct(product)}
-              className="mt-auto w-full bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transform hover:scale-102 transition-all duration-300 font-medium"
+              className="mt-auto w-full bg-[#75906d] text-white px-6 py-3 rounded-lg hover:bg-[#5a7154] transform hover:scale-102 transition-all duration-300 font-medium"
             >
               Mostrar Pix
             </button>
@@ -83,9 +83,9 @@ function QRModal({ product, onClose }) {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 backdrop-blur-sm">
-      <div className="bg-white p-8 rounded-2xl flex items-center flex-col border-2 border-blue-200 shadow-2xl max-w-md w-full">
-        <div className="bg-blue-50 p-6 rounded-xl mb-6 w-full">
-          <h2 className="text-2xl font-bold mb-6 text-blue-800 text-center">
+      <div className="bg-white p-8 rounded-2xl flex items-center flex-col border-2 border-[#a5b69d] shadow-2xl max-w-md w-full">
+        <div className="bg-[#f0f4ed] p-6 rounded-xl mb-6 w-full">
+          <h2 className="text-2xl font-bold mb-6 text-[#5a7154] text-center">
             {product.name}
           </h2>
           {pixQrCodeValue && (
@@ -94,18 +94,18 @@ function QRModal({ product, onClose }) {
             </div>
           )}
         </div>
-        <p className="text-blue-600 text-2xl font-bold mb-6">
+        <p className="text-[#75906d] text-2xl font-bold mb-6">
           R$ {product.price?.toFixed(2)}
         </p>
         <button
           onClick={handleOnCopyPasteClick}
-          className="w-full bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transform hover:scale-102 transition-all duration-300 font-medium mb-3"
+          className="w-full bg-[#75906d] text-white px-6 py-3 rounded-lg hover:bg-[#5a7154] transform hover:scale-102 transition-all duration-300 font-medium mb-3"
         >
           {!copyPix ? "Pix Copiar e Colar" : "Copiado! ✓"}
         </button>
         <button
           onClick={onClose}
-          className="w-full bg-gray-100 text-blue-600 px-6 py-3 rounded-lg hover:bg-gray-200 transform hover:scale-102 transition-all duration-300 font-medium"
+          className="w-full bg-[#f0f4ed] text-[#5a7154] px-6 py-3 rounded-lg hover:bg-[#e5ede0] transform hover:scale-102 transition-all duration-300 font-medium"
         >
           Fechar
         </button>
@@ -116,9 +116,9 @@ function QRModal({ product, onClose }) {
 
 function NicolasPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 via-white to-blue-50">
+    <div className="min-h-screen bg-gradient-to-b from-[#f0f4ed] via-white to-[#f0f4ed]">
       <div className="container mx-auto py-12 flex flex-col items-center">
-        <h1 className="text-5xl font-bold mb-12 text-blue-700 animate-bounce max-md:text-2xl">
+        <h1 className="text-5xl font-bold mb-12 text-[#5a7154] animate-bounce max-md:text-2xl">
           👶 Chá de fraldas do Nicolas! 🎉
         </h1>
         <ProductList products={productsData.results} />
