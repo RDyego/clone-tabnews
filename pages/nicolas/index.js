@@ -1,5 +1,6 @@
 import "app/globals.css";
 import productsData from "app/public/products.json";
+import pampersData from "app/public/pampers.json";
 import Image from "next/image";
 import { generatePayloadPix } from "infra/payload.js";
 import { useEffect, useState } from "react";
@@ -13,8 +14,8 @@ function ProductList({ products }) {
         .filter((x) => x.price)
         .filter((x) => x.name.toLowerCase().includes("fralda"))
         .filter((x) => !x.name.toLowerCase().includes("bigfral"))
-        .filter((x) => x.price / 100 > 45 && x.price / 100 < 100)
         .map((p) => ({ ...p, price: p.price / 100 }))
+        .filter((x) => x.price > 45 && x.price < 100)
         .map((product, index) => (
           <div
             key={index}
@@ -56,6 +57,15 @@ function ProductList({ products }) {
 function QRModal({ product, onClose }) {
   const [pixQrCodeValue, setPixQrCodeValue] = useState("");
   const [copyPix, setCopyPix] = useState(false);
+  const [selectedPamper, setSelectedPamper] = useState(null);
+  const [totalPrice, setTotalPrice] = useState(product.price);
+
+  useEffect(() => {
+    // Update total price when pamper is selected or deselected
+    setTotalPrice(
+      selectedPamper ? product.price + selectedPamper.price : product.price,
+    );
+  }, [selectedPamper, product.price]);
 
   useEffect(() => {
     setPixQrCodeValue(
@@ -66,10 +76,10 @@ function QRModal({ product, onClose }) {
         transactionId: `NICOLAS${new Date().getTime()}`,
         message: "",
         cep: "60744780",
-        value: product.price,
+        value: totalPrice,
       }),
     );
-  }, [product]);
+  }, [totalPrice]);
 
   const handleOnCopyPasteClick = () => {
     if (!copyPix && !!pixQrCodeValue) {
@@ -81,34 +91,89 @@ function QRModal({ product, onClose }) {
     }
   };
 
+  const handlePamperSelect = (pamper) => {
+    setSelectedPamper(selectedPamper?.asin === pamper.asin ? null : pamper);
+  };
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 backdrop-blur-sm">
-      <div className="bg-white p-8 rounded-2xl flex items-center flex-col border-2 border-[#a5b69d] shadow-2xl max-w-md w-full">
-        <div className="bg-[#f0f4ed] p-6 rounded-xl mb-6 w-full">
-          <h2 className="text-2xl font-bold mb-6 text-[#5a7154] text-center">
+      <div className="bg-white p-4 gap-2 rounded-2xl flex items-center flex-col border-2 border-[#a5b69d] shadow-2xl max-w-md w-full">
+        <div className="bg-[#f0f4ed] p-2 rounded-xl w-full">
+          <h2 className="text-xl font-bold mb-2 text-[#5a7154] text-center truncate">
             {product.name}
           </h2>
           {pixQrCodeValue && (
             <div className="flex justify-center">
-              <QRCodeSVG value={`${pixQrCodeValue}`} size={200} />
+              <QRCodeSVG value={`${pixQrCodeValue}`} size={150} />
             </div>
           )}
+          <p className="text-[#75906d] text-2xl font-bold flex flex-col justify-center items-center">
+            <span>R$ {totalPrice.toFixed(2)}</span>
+            {selectedPamper && (
+              <span className="text-xs block text-center">(Fralda + Mimo)</span>
+            )}
+          </p>
         </div>
-        <p className="text-[#75906d] text-2xl font-bold mb-6">
-          R$ {product.price?.toFixed(2)}
-        </p>
-        <button
-          onClick={handleOnCopyPasteClick}
-          className="w-full bg-[#75906d] text-white px-6 py-3 rounded-lg hover:bg-[#5a7154] transform hover:scale-102 transition-all duration-300 font-medium mb-3"
-        >
-          {!copyPix ? "Pix Copiar e Colar" : "Copiado! ✓"}
-        </button>
-        <button
-          onClick={onClose}
-          className="w-full bg-[#f0f4ed] text-[#5a7154] px-6 py-3 rounded-lg hover:bg-[#e5ede0] transform hover:scale-102 transition-all duration-300 font-medium"
-        >
-          Fechar
-        </button>
+
+        <div className="w-full gap-2">
+          <h3 className="text-xl font-bold text-[#5a7154] text-center mb-2">
+            Escolha um mimo 🎉
+          </h3>
+          <div className="max-h-60 overflow-y-auto">
+            {pampersData.results
+              .filter((x) => x.price)
+              .filter((x) => !x.name.toLowerCase().includes("boneca"))
+              .map((p) => ({ ...p, price: p.price / 100 }))
+              .filter((x) => x.price > 10 && x.price < 60)
+              // .slice(0, 5)
+              .map((pamper, index) => (
+                <div
+                  key={index}
+                  onClick={() => handlePamperSelect(pamper)}
+                  className={`flex items-center p-3 mb-2 rounded-lg cursor-pointer transition-all ${
+                    selectedPamper?.asin === pamper.asin
+                      ? "bg-[#e5ede0] border-2 border-[#75906d]"
+                      : "bg-[#f0f4ed] hover:bg-[#e5ede0]"
+                  }`}
+                >
+                  <div className="w-16 h-16 mr-3 flex-shrink-0">
+                    <Image
+                      src={pamper.thumbnail}
+                      alt={pamper.name}
+                      width={64}
+                      height={64}
+                      className="w-full h-full object-contain"
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="text-sm font-medium text-[#5a7154]">
+                      {pamper.name.length > 40
+                        ? pamper.name.substring(0, 40) + "..."
+                        : pamper.name}
+                    </h4>
+                    <p className="text-[#75906d] text-sm font-semibold">
+                      R$ {pamper.price.toFixed(2)}
+                    </p>
+                  </div>
+                </div>
+              ))}
+          </div>
+        </div>
+
+        <div className="flex gap-2 justify-center items-center">
+          <button
+            onClick={handleOnCopyPasteClick}
+            className="flex-1 bg-[#75906d] h-12 text-white p-3 rounded-lg hover:bg-[#5a7154] transform hover:scale-102 transition-all duration-300 font-medium"
+          >
+            {!copyPix ? "Pix Copiar e Colar" : "Copiado! ✓"}
+          </button>
+          <button
+            onClick={onClose}
+            className="bg-[#f0f4ed] h-12 text-[#5a7154] p-3 rounded-lg hover:bg-[#e5ede0] transform hover:scale-102 transition-all duration-300 font-medium"
+          >
+            Fechar
+          </button>
+        </div>
       </div>
     </div>
   );
