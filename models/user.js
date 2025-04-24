@@ -1,4 +1,5 @@
 import database from "infra/database.js";
+import password from "models/password.js";
 import { ValidationError, NotFoundError } from "infra/errors.js";
 
 async function findOneByUsername(username) {
@@ -32,6 +33,7 @@ async function findOneByUsername(username) {
 async function create(userInputValues) {
   await validateUniqueEmail(userInputValues.email);
   await validateUniqueUsername(userInputValues.username);
+  await hashPassWordInObject(userInputValues);
   const newUser = await runInsertQuery(userInputValues);
   return newUser;
 
@@ -73,6 +75,11 @@ async function create(userInputValues) {
         action: "Utilize outro username para realizar o cadastro.",
       });
     }
+  }
+
+  async function hashPassWordInObject(userInputValues) {
+    const hashedPassowed = await password.hash(userInputValues.password);
+    userInputValues.password = hashedPassowed;
   }
 
   async function runInsertQuery(userInputValues) {
