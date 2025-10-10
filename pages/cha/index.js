@@ -1,6 +1,7 @@
 import "app/globals.css";
 import productsData from "app/public/products.json";
 import pampersData from "app/public/pampers.json";
+import pampersGirlsData from "app/public/pampersGirls.json";
 import Image from "next/image";
 import { generatePayloadPix } from "infra/payload.js";
 import { useEffect, useState } from "react";
@@ -89,13 +90,13 @@ function Formulario({ onSubmit }) {
       </label>
       <input
         name="nome"
-        placeholder="Nome do bebê"
+        placeholder="O primeiro Nome do bebê"
         value={form.nome}
         onChange={handleChange}
         className="border p-2 rounded"
         required
         pattern="[A-Za-z]+"
-        title="Somente letras, sem acentos ou caracteres especiais"
+        title="O Primeiro nome, somente letras, sem acentos ou caracteres especiais"
       />
 
       <label className="flex items-center gap-1">
@@ -112,7 +113,7 @@ function Formulario({ onSubmit }) {
         <option value="">Sexo do bebê</option>
         <option value="masculino">Masculino</option>
         <option value="feminino">Feminino</option>
-        <option value="outro">Outro</option>
+        <option value="outro">Outro/Não sei</option>
       </select>
 
       <label className="flex items-center gap-1">
@@ -143,7 +144,7 @@ function Formulario({ onSubmit }) {
 
       <label className="flex items-center gap-1">
         Chave Pix Aleatória
-        <InfoIcon tip="Informe a chave Pix para receber os presentes em dinheiro." />
+        <InfoIcon tip="Informe a chave Pix Aleatória para receber os presentes em dinheiro." />
       </label>
       <input
         name="pix"
@@ -200,7 +201,7 @@ function Formulario({ onSubmit }) {
           </a>{" "}
           e revisado por{" "}
           <a
-            href="https://github.com/NicoBala"
+            href="https://github.com/NicoBullet"
             target="_blank"
             rel="noopener noreferrer"
             className="underline hover:text-blue-700"
@@ -213,7 +214,7 @@ function Formulario({ onSubmit }) {
   );
 }
 
-function ProductList({ products, themeColor, pixKey, bbName }) {
+function ProductList({ products, themeColor, pixKey, bbName, sexo }) {
   const [selectedProduct, setSelectedProduct] = useState(null);
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl w-full px-4">
@@ -267,13 +268,14 @@ function ProductList({ products, themeColor, pixKey, bbName }) {
           themeColor={themeColor}
           pixKey={pixKey}
           bbName={bbName}
+          sexo={sexo}
         />
       )}
     </div>
   );
 }
 
-function QRModal({ product, onClose, themeColor, pixKey, bbName }) {
+function QRModal({ product, onClose, themeColor, pixKey, bbName, sexo }) {
   const [pixQrCodeValue, setPixQrCodeValue] = useState("");
   const [copyPix, setCopyPix] = useState(false);
   const [selectedPamper, setSelectedPamper] = useState(null);
@@ -313,6 +315,24 @@ function QRModal({ product, onClose, themeColor, pixKey, bbName }) {
     setSelectedPamper(selectedPamper?.asin === pamper.asin ? null : pamper);
   };
 
+  const pampersList =
+    sexo === "masculino"
+      ? pampersData.results.filter(
+          (x) => !x.name.toLowerCase().includes("boneca"),
+        )
+      : sexo === "feminino"
+        ? pampersGirlsData.results.filter(
+            (x) => !x.name.toLowerCase().includes("azul"),
+          )
+        : [
+            ...pampersData.results.filter(
+              (x) => !x.name.toLowerCase().includes("boneca"),
+            ),
+            ...pampersGirlsData.results.filter(
+              (x) => !x.name.toLowerCase().includes("azul"),
+            ),
+          ];
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 backdrop-blur-sm">
       <div
@@ -347,9 +367,8 @@ function QRModal({ product, onClose, themeColor, pixKey, bbName }) {
             Escolha um mimo 🎉
           </h3>
           <div className="max-h-60 overflow-y-auto">
-            {pampersData.results
+            {pampersList
               .filter((x) => x.price)
-              .filter((x) => !x.name.toLowerCase().includes("boneca"))
               .map((p) => ({ ...p, price: p.price / 100 }))
               .filter((x) => x.price > 10 && x.price < 60)
               .map((pamper, index) => (
@@ -438,6 +457,7 @@ function ChaPage() {
       formData = null;
     }
   }
+  const sexo = formData?.sexo || "";
 
   // Se não houver bb ou form, mostra o formulário
   if (!bb || !formData) {
@@ -484,7 +504,7 @@ function ChaPage() {
             {!copyUrl ? "Copiar link do Chá de Fralda" : "Copiado! ✓"}
           </button>
           <div>
-            <b>Data:</b> {formData.data}
+            <b>Data:</b> {formatDatePtBR(formData.data)}
           </div>
           <div>
             <b>Local:</b> {formData.local}
@@ -498,10 +518,22 @@ function ChaPage() {
           themeColor={themeColor}
           pixKey={formData.pix}
           bbName={bb}
+          sexo={sexo}
         />
       </div>
     </div>
   );
+}
+
+function formatDatePtBR(dateStr) {
+  if (!dateStr) return "";
+  const [y, m, d] = dateStr.split("-");
+  const dt = new Date(Number(y), Number(m) - 1, Number(d));
+  return new Intl.DateTimeFormat("pt-BR", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }).format(dt);
 }
 
 export default ChaPage;
