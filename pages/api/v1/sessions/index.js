@@ -24,9 +24,7 @@ async function postHandler(req, res) {
     maxAge: session.EXPIRATION_IN_MILLESECONDS / 1000,
     path: "/",
   });
-    res.setHeader(("Set-Cookie"), [
-      setCookie
-    ]);
+  res.setHeader("Set-Cookie", [setCookie]);
 
   return res.status(201).json(newSession);
 }
