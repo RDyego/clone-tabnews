@@ -35,6 +35,7 @@ export class ServiceError extends Error {
     };
   }
 }
+
 export class NotFoundError extends Error {
   constructor({ cause, message, action }) {
     super(message || "Não foi possível encontrar este recurso no sistema.", {
@@ -82,6 +83,27 @@ export class MethodNotAllowedError extends Error {
     this.name = "MethodNotAllowedError";
     this.action = "Verifique se o método HTTP utilizado está correto.";
     this.statusCode = 405;
+  }
+
+  toJSON() {
+    return {
+      name: this.name,
+      message: this.message,
+      action: this.action,
+      statusCode: this.statusCode,
+    };
+  }
+}
+
+export class UnauthorizedError extends Error {
+  constructor({ cause, message, action }) {
+    super(message || "Usuário não autenticado.", {
+      cause,
+    });
+
+    this.name = "UnauthorizedError";
+    this.action = action || "Faça novamente o logion para continuar.";
+    this.statusCode = 401;
   }
 
   toJSON() {
